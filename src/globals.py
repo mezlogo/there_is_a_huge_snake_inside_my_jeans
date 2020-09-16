@@ -1,1 +1,1 @@
-chromedriver = "/home/mezlogo/downloads/chromedriver"
+chromedriver = "D:\PyCharm_Projects\Web_Driver\chromedriver.exe"
