@@ -9,18 +9,18 @@ Example shows how to build and develop artifact using standard python ecosystem:
 Getting started:
 1. Install venv for python project isolation: `python -m venv .`
 
-  1_alt. For Windows: To use BASH you can install Cygwin, for instance
+**For Windows**: To use BASH you can install Cygwin, for instance
   
 2. **BASH ONLY** activate venv for shell: `source bin/activate`
 
-  2_alt. For Windows: You need to change directory to /Scripts and perform next commands: first - `set -o igncr`, second - `source activate
+**For Windows**: You need to change directory to /Scripts and perform next commands: first - `set -o igncr`, second - `source activate
 ` 
 
 3. Install manual declared dependencies: `pip install -r dependencies.txt`
 
-4. You can list installed dependencies: `ls -al lib/python3.8/site-packages`
+4. You can lis. Fort installed dependencies: `ls -al lib/python3.8/site-packages`
 
-  4_alt. For Windows: `ls -al lib/site-packages`
+**For Windows**: `ls -al lib/site-packages`
   
 5. Run script: `python src/hello.py`
 6. Download chrome driver: `https://sites.google.com/a/chromium.org/chromedriver/`
