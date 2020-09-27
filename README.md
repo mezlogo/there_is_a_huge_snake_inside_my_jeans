@@ -27,4 +27,7 @@ Getting started:
 7. Modify path to chrome in `src/globals.py`
 8. Create and manipulate chrome using: `python src/open.py`
 9. Open chrome with remote address: `chromium --remote-debugging-port=9222 --user-data-dir=/tmp/chrometmp`
+
+**For Windows**: You need to change directory to the one in which the Chrome application is located and perform command: `./chrome.exe --remote-debugging-port=9222 --user-data-dir=/tmp/chrometmp`
+
 10. Connect to created browser: `python src/remote.py`
