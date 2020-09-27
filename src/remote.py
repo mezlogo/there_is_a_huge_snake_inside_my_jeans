@@ -1,7 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from functional import seq
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
+from functional import seq
 from globals import chromedriver
 
 #Example of listing all content from plain files in github with ajax requests
@@ -66,29 +69,53 @@ driver = connect_to_opened_chrome(chromedriver, 9222)
 # Example 2
 # Compare Vacancies from HeadHunter
 driver.get("https://spb.hh.ru/vacancies/data-scientist")
+wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+    until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
 vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
-list_of_vacancies = []
 
-for vacancy in seq(vacancies):
-    try:
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
+# list_of_vacancies = []
+#
+# for vacancy in seq(vacancies):
+#     try:
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("div.g-user-content").text)
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
+#
+#     except NoSuchElementException:
+#         list_of_vacancies.append(None)
+#
+# separated_vacancies = [list_of_vacancies[x:x+4] for x in range(0, len(list_of_vacancies), 4)]
+# print(*separated_vacancies)
 
-    except NoSuchElementException:
-        list_of_vacancies.append(None)
+# ----------------------------------
+# Example 3
+# Create dataset from vacancies from HeadHunter (see also Example 2)
+list_of_links = []
 
-separated_vacancies = [list_of_vacancies[x:x+3] for x in range(0, len(list_of_vacancies), 3)]
-print(*separated_vacancies)
+for link in vacancies[0:2]: # there's 50 vacancies on the page - let's test on some
+    link.find_element_by_css_selector("a.HH-LinkModifier").click()
+    driver.switch_to.window(driver.window_handles[0])
+    WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+        until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
 
-# list_of_vacancies = seq(vacancies).map(lambda vacancy:
-#     [vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"),
-#      vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text")])
-# print(list_of_vacancies)
+for handle in driver.window_handles[1:]:
+    driver.switch_to.window(handle)
+    WebDriverWait(driver, 5, poll_frequency=1). \
+        until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-description")))
+    print("---")
+    print(driver.find_element_by_css_selector("div.bloko-tag-list").text)
+    driver.close()
 
-# print(*seq(vacancies).map(lambda vacancy:
-#     [vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"),
-#      vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text")])
-# )
+# for vacancy in seq(vacancies):
+#     try:
+#         # list_of_links.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("href"))
+#         pass
+#         wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+#             until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
+#         vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("href")
+#
+#     except:
+#         pass
 
 driver.quit()
