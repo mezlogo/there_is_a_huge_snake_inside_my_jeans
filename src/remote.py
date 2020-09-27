@@ -73,25 +73,37 @@ wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElem
     until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
 vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
 
-# list_of_vacancies = []
-#
-# for vacancy in seq(vacancies):
-#     try:
-#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
-#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
-#         list_of_vacancies.append(vacancy.find_element_by_css_selector("div.g-user-content").text)
-#         list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
-#
-#     except NoSuchElementException:
-#         list_of_vacancies.append(None)
-#
-# separated_vacancies = [list_of_vacancies[x:x+4] for x in range(0, len(list_of_vacancies), 4)]
-# print(*separated_vacancies)
+list_of_vacancies = []
+
+for vacancy in seq(vacancies):
+    try:
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("div.g-user-content").text)
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
+
+    except NoSuchElementException:
+        list_of_vacancies.append(None)
+
+separated_vacancies = [list_of_vacancies[x:x+4] for x in range(0, len(list_of_vacancies), 4)]
+print(*separated_vacancies)
 
 # ----------------------------------
 # Example 3
-# Create dataset from vacancies from HeadHunter (see also Example 2)
-list_of_links = []
+# Explore some vacancy from HeadHunter
+# for link in vacancies[0:1]: # there's 50 vacancies on the page - let's test on some
+#     link.find_element_by_css_selector("a.HH-LinkModifier").click()
+#     driver.switch_to.window(driver.window_handles[0])
+#
+# for handle in driver.window_handles[1:]:
+#     driver.switch_to.window(handle)
+# driver.get("https://spb.hh.ru/vacancy/39462746?query=data%20scientist")
+# vacancy_title = driver.find_element_by_css_selector("div.vacancy-title")
+# print(vacancy_title)
+
+# ----------------------------------
+# Example 4
+# Create dataset from vacancies from HeadHunter (see also Example 2 and Example 3)
 
 for link in vacancies[0:2]: # there's 50 vacancies on the page - let's test on some
     link.find_element_by_css_selector("a.HH-LinkModifier").click()
@@ -106,6 +118,8 @@ for handle in driver.window_handles[1:]:
     print("---")
     print(driver.find_element_by_css_selector("div.bloko-tag-list").text)
     driver.close()
+
+# list_of_links = []
 
 # for vacancy in seq(vacancies):
 #     try:
