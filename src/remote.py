@@ -67,12 +67,28 @@ driver = connect_to_opened_chrome(chromedriver, 9222)
 # Compare Vacancies from HeadHunter
 driver.get("https://spb.hh.ru/vacancies/data-scientist")
 vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
-# print("Vacancies: ", *enumerate(seq(vacancies).map(lambda vacancy:
-#     vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text")), start=1))
-print(*seq(vacancies).map(lambda vacancy:
-    [vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"),
-     vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text")])
-)
-# seq(vacancies).map(lambda vacancy: vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").get_attribute("text")) # NoSuchElementException - need to handle with that somehow
+list_of_vacancies = []
+
+for vacancy in seq(vacancies):
+    try:
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
+        list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
+
+    except NoSuchElementException:
+        list_of_vacancies.append(None)
+
+separated_vacancies = [list_of_vacancies[x:x+3] for x in range(0, len(list_of_vacancies), 3)]
+print(*separated_vacancies)
+
+# list_of_vacancies = seq(vacancies).map(lambda vacancy:
+#     [vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"),
+#      vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text")])
+# print(list_of_vacancies)
+
+# print(*seq(vacancies).map(lambda vacancy:
+#     [vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"),
+#      vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text")])
+# )
 
 driver.quit()
