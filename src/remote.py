@@ -7,6 +7,9 @@ from selenium.common.exceptions import *
 from functional import seq
 from globals import chromedriver
 
+import pandas as pd
+
+
 #Example of listing all content from plain files in github with ajax requests
 
 def connect_to_opened_chrome(path_to_chrome_driver, port):
@@ -68,25 +71,25 @@ driver = connect_to_opened_chrome(chromedriver, 9222)
 # ----------------------------------
 # Example 2
 # Compare Vacancies from HeadHunter
-driver.get("https://spb.hh.ru/vacancies/data-scientist")
-wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
-    until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
-vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
-
-list_of_vacancies = []
-
-for vacancy in seq(vacancies):
-    try:
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("div.g-user-content").text)
-        list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
-
-    except NoSuchElementException:
-        list_of_vacancies.append(None)
-
-separated_vacancies = [list_of_vacancies[x:x+4] for x in range(0, len(list_of_vacancies), 4)]
-print(*separated_vacancies)
+# driver.get("https://spb.hh.ru/vacancies/data-scientist")
+# wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+#     until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
+# vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
+#
+# list_of_vacancies = []
+#
+# for vacancy in seq(vacancies):
+#     try:
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a.HH-LinkModifier").get_attribute("text"))
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("a[data-qa=\"vacancy-serp__vacancy-employer\"]").get_attribute("text"))
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("div.g-user-content").text)
+#         list_of_vacancies.append(vacancy.find_element_by_css_selector("span[data-qa=\"vacancy-serp__vacancy-compensation\"]").text)
+#
+#     except NoSuchElementException:
+#         list_of_vacancies.append(None)
+#
+# separated_vacancies = [list_of_vacancies[x:x+4] for x in range(0, len(list_of_vacancies), 4)]
+# print(*separated_vacancies)
 
 # ----------------------------------
 # Example 3
@@ -97,27 +100,38 @@ print(*separated_vacancies)
 #
 # for handle in driver.window_handles[1:]:
 #     driver.switch_to.window(handle)
-# driver.get("https://spb.hh.ru/vacancy/39462746?query=data%20scientist")
-# vacancy_title = driver.find_element_by_css_selector("div.vacancy-title")
-# print(vacancy_title)
+
+driver.get("https://spb.hh.ru/vacancy/39110818?query=data%20scientist")
+vacancy_title = driver.find_element_by_css_selector("h1.bloko-header-1")
+vacancy_salary = driver.find_element_by_css_selector("p.vacancy-salary")
+vacancy_description = driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]")
+vacancy_tags = driver.find_element_by_css_selector("div.bloko-tag-list")
+
+vacancy_content = [vacancy_title.text, vacancy_salary.text, vacancy_description.text, vacancy_tags.text]
+
+vacancies = pd.DataFrame(data=vacancy_content, index=['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']).T
+vacancies.to_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv', encoding="cp1251")
+
+# v = pd.read_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv', encoding="cp1251", index_col=False)
+# print(v)
 
 # ----------------------------------
 # Example 4
 # Create dataset from vacancies from HeadHunter (see also Example 2 and Example 3)
 
-for link in vacancies[0:2]: # there's 50 vacancies on the page - let's test on some
-    link.find_element_by_css_selector("a.HH-LinkModifier").click()
-    driver.switch_to.window(driver.window_handles[0])
-    WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
-        until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
-
-for handle in driver.window_handles[1:]:
-    driver.switch_to.window(handle)
-    WebDriverWait(driver, 5, poll_frequency=1). \
-        until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-description")))
-    print("---")
-    print(driver.find_element_by_css_selector("div.bloko-tag-list").text)
-    driver.close()
+# for link in vacancies[0:2]: # there's 50 vacancies on the page - let's test on some
+#     link.find_element_by_css_selector("a.HH-LinkModifier").click()
+#     driver.switch_to.window(driver.window_handles[0])
+#     WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+#         until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
+#
+# for handle in driver.window_handles[1:]:
+#     driver.switch_to.window(handle)
+#     WebDriverWait(driver, 5, poll_frequency=1). \
+#         until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-description")))
+#     print("---")
+#     print(driver.find_element_by_css_selector("div.bloko-tag-list").text)
+#     driver.close()
 
 # list_of_links = []
 
