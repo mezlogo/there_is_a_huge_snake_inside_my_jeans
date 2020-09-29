@@ -22,6 +22,8 @@ def connect_to_opened_chrome(path_to_chrome_driver, port):
 driver = connect_to_opened_chrome(chromedriver, 9222)
 #go to project page
 
+main_wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException])
+
 # Origin code - Github repo interspection
 # ----------------------------------
 # driver.get("https://github.com/mezlogo/there_is_a_huge_snake_inside_my_jeans")
@@ -71,11 +73,11 @@ driver = connect_to_opened_chrome(chromedriver, 9222)
 # ----------------------------------
 # Example 2
 # Compare Vacancies from HeadHunter
-# driver.get("https://spb.hh.ru/vacancies/data-scientist")
-# wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
-#     until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
-# vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
-#
+driver.get("https://spb.hh.ru/vacancies/data-scientist")
+wait_1 = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+    until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
+vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
+
 # list_of_vacancies = []
 #
 # for vacancy in seq(vacancies):
@@ -94,26 +96,54 @@ driver = connect_to_opened_chrome(chromedriver, 9222)
 # ----------------------------------
 # Example 3
 # Explore some vacancy from HeadHunter
-# for link in vacancies[0:1]: # there's 50 vacancies on the page - let's test on some
-#     link.find_element_by_css_selector("a.HH-LinkModifier").click()
-#     driver.switch_to.window(driver.window_handles[0])
+
+vacancies_df = pd.DataFrame()
+
+for link in vacancies[0:16]:
+    try:
+        link.find_element_by_css_selector("a.HH-LinkModifier").click()
+        driver.switch_to.window(driver.window_handles[1])
+        element = main_wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa=\"vacancy-description\"]")))
+        vacancy_content = []
+
+        # vacancy_title = driver.find_element_by_css_selector("h1.bloko-header-1")
+        # vacancy_salary = driver.find_element_by_css_selector("p.vacancy-salary")
+        # vacancy_description = driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]")
+        # vacancy_tags = driver.find_element_by_css_selector("div.bloko-tag-list")
+        vacancy_content.append(driver.find_element_by_css_selector("h1.bloko-header-1").text)
+        vacancy_content.append(driver.find_element_by_css_selector("p.vacancy-salary").text)
+        vacancy_content.append(driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]").text)
+        vacancy_content.append(driver.find_element_by_css_selector("div.bloko-tag-list").text)
+        # vacancies_df = vacancies_df.append(vacancy_content)
+        vacancies_df = pd.concat([vacancies_df, pd.Series(vacancy_content)], axis=1)
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
+    except (NoSuchElementException, StaleElementReferenceException):
+        vacancy_content.append(None)
+        vacancies_df = pd.concat([vacancies_df, pd.Series(vacancy_content)], axis=1)
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
+
+
+# vacancies_df = pd.DataFrame(index=['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']).T
 #
 # for handle in driver.window_handles[1:]:
 #     driver.switch_to.window(handle)
+#     WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException]). \
+#         until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa=\"vacancy-description\"]")))
+#     vacancy_title = driver.find_element_by_css_selector("h1.bloko-header-1")
+#     vacancy_salary = driver.find_element_by_css_selector("p.vacancy-salary")
+#     vacancy_description = driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]")
+#     vacancy_tags = driver.find_element_by_css_selector("div.bloko-tag-list")
+#     vacancy_content = [vacancy_title.text, vacancy_salary.text, vacancy_description.text, vacancy_tags.text]
+#     vacancies_df = vacancies_df.append(vacancy_content)
+#     driver.close()
 
-driver.get("https://spb.hh.ru/vacancy/39110818?query=data%20scientist")
-vacancy_title = driver.find_element_by_css_selector("h1.bloko-header-1")
-vacancy_salary = driver.find_element_by_css_selector("p.vacancy-salary")
-vacancy_description = driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]")
-vacancy_tags = driver.find_element_by_css_selector("div.bloko-tag-list")
+vacancies_df.to_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv')
 
-vacancy_content = [vacancy_title.text, vacancy_salary.text, vacancy_description.text, vacancy_tags.text]
-
-vacancies = pd.DataFrame(data=vacancy_content, index=['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']).T
-vacancies.to_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv', encoding="cp1251")
-
-# v = pd.read_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv', encoding="cp1251", index_col=False)
-# print(v)
+df = pd.read_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv').T
+df.columns = ['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']
+print(df)
 
 # ----------------------------------
 # Example 4
