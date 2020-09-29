@@ -99,7 +99,7 @@ vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
 
 vacancies_df = pd.DataFrame()
 
-for link in vacancies[0:16]:
+for link in vacancies:
     try:
         link.find_element_by_css_selector("a.HH-LinkModifier").click()
         driver.switch_to.window(driver.window_handles[1])
@@ -110,11 +110,17 @@ for link in vacancies[0:16]:
         # vacancy_salary = driver.find_element_by_css_selector("p.vacancy-salary")
         # vacancy_description = driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]")
         # vacancy_tags = driver.find_element_by_css_selector("div.bloko-tag-list")
+        # vacancy_content = ['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']
+        # vacancies_df = vacancies_df.append(vacancy_content)
+
         vacancy_content.append(driver.find_element_by_css_selector("h1.bloko-header-1").text)
+        vacancy_content.append(driver.find_element_by_css_selector("a[data-qa=\"vacancy-company-name\"]").text)
+        vacancy_content.append(driver.find_element_by_css_selector("p[data-qa=\"vacancy-view-location\"]").text)
+        vacancy_content.append(driver.find_element_by_css_selector("span[data-qa=\"vacancy-experience\"]").text)
+        vacancy_content.append(driver.find_element_by_css_selector("p[data-qa=\"vacancy-view-employment-mode\"]").text)
         vacancy_content.append(driver.find_element_by_css_selector("p.vacancy-salary").text)
         vacancy_content.append(driver.find_element_by_css_selector("div[data-qa=\"vacancy-description\"]").text)
         vacancy_content.append(driver.find_element_by_css_selector("div.bloko-tag-list").text)
-        # vacancies_df = vacancies_df.append(vacancy_content)
         vacancies_df = pd.concat([vacancies_df, pd.Series(vacancy_content)], axis=1)
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
@@ -142,7 +148,7 @@ for link in vacancies[0:16]:
 vacancies_df.to_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv')
 
 df = pd.read_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv').T
-df.columns = ['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']
+df.columns = ['vacancy_title', 'company_name', 'location', 'required_experience', 'employment_mode', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']
 print(df)
 
 # ----------------------------------
