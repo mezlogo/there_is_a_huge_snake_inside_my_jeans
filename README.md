@@ -24,7 +24,7 @@ Getting started:
   
 5. Run script: `python src/hello.py`
 6. Download chrome driver: `https://sites.google.com/a/chromium.org/chromedriver/`
-7. Modify path to chrome in `src/globals.py`
+7. Modify path to chrome in `src/globals.py`    
 8. Create and manipulate chrome using: `python src/open.py`
 9. Open chrome with remote address: `chromium --remote-debugging-port=9222 --user-data-dir=/tmp/chrometmp`
 

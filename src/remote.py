@@ -10,17 +10,17 @@ from globals import chromedriver
 import pandas as pd
 
 
-#Example of listing all content from plain files in github with ajax requests
+# Example of listing all content from plain files in github with ajax requests
 
 def connect_to_opened_chrome(path_to_chrome_driver, port):
-  chrome_options = Options()
-  chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:" + str(port))
-  chrome_driver = path_to_chrome_driver
-  return webdriver.Chrome(chrome_driver, options=chrome_options)
+    chrome_options = Options()
+    chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:" + str(port))
+    chrome_driver = path_to_chrome_driver
+    return webdriver.Chrome(chrome_driver, options=chrome_options)
 
-#connect by port number and driver path
+# connect by port number and driver path
 driver = connect_to_opened_chrome(chromedriver, 9222)
-#go to project page
+# go to project page
 
 main_wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException])
 
@@ -28,15 +28,15 @@ main_wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuc
 # ----------------------------------
 # driver.get("https://github.com/mezlogo/there_is_a_huge_snake_inside_my_jeans")
 # arrayOfWebElements = driver.find_elements_by_css_selector("div.Details div.Box-row")
-#get list of all files in repository
-#you can test this query by javascript console in browser `document.querySelectorAll("div.Details div.Box-row")`
-#convert to PyFunctional seq https://github.com/EntilZha/PyFunctional
+# get list of all files in repository
+# you can test this query by javascript console in browser `document.querySelectorAll("div.Details div.Box-row")`
+# convert to PyFunctional seq https://github.com/EntilZha/PyFunctional
 # ----------------------------------
 # elems = seq(arrayOfWebElements)
-#print pairs of file name and file type (dir of plain file)
-#example for js with only file name
+# print pairs of file name and file type (dir of plain file)
+# example for js with only file name
 # document.querySelectorAll("div.Details div.Box-row")[0].querySelector("a[title]").getAttribute("title")
-#example with pair of type and title
+# example with pair of type and title
 # Array.from(document.querySelectorAll("div.Details div.Box-row")).map(elem => "title: " + elem.querySelector("svg[aria-label]").getAttribute("aria-label") + " type: " + elem.querySelector("a[title]").getAttribute("title"))
 # ----------------------------------
 # Origin code - Github repo interspection
@@ -99,11 +99,12 @@ vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
 
 vacancies_df = pd.DataFrame()
 
-for link in vacancies:
+for link in vacancies[0:3]:
     try:
         link.find_element_by_css_selector("a.HH-LinkModifier").click()
         driver.switch_to.window(driver.window_handles[1])
-        element = main_wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa=\"vacancy-description\"]")))
+        element = main_wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa=\"vacancy-description\"]")))
         vacancy_content = []
 
         # vacancy_title = driver.find_element_by_css_selector("h1.bloko-header-1")
@@ -130,7 +131,6 @@ for link in vacancies:
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
 
-
 # vacancies_df = pd.DataFrame(index=['vacancy_title', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']).T
 #
 # for handle in driver.window_handles[1:]:
@@ -145,10 +145,11 @@ for link in vacancies:
 #     vacancies_df = vacancies_df.append(vacancy_content)
 #     driver.close()
 
-vacancies_df.to_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv')
+vacancies_df.to_csv('/home/aleksey/PycharmProjects/Datasets/vacancies_data.csv')
 
-df = pd.read_csv('D:\\PyCharm_Projects\\Created DataFrames\\vacancies_data.csv').T
-df.columns = ['vacancy_title', 'company_name', 'location', 'required_experience', 'employment_mode', 'vacancy_salary', 'vacancy_description', 'vacancy_tags']
+df = pd.read_csv('/home/aleksey/PycharmProjects/Datasets/vacancies_data.csv').T
+df.columns = ['vacancy_title', 'company_name', 'location', 'required_experience', 'employment_mode', 'vacancy_salary',
+              'vacancy_description', 'vacancy_tags']
 print(df)
 
 # ----------------------------------
