@@ -11,26 +11,17 @@ import pandas as pd
 
 
 # Example of listing all content from plain files in github with ajax requests
-
 def connect_to_opened_chrome(path_to_chrome_driver, port):
     chrome_options = Options()
     chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:" + str(port))
     chrome_driver = path_to_chrome_driver
     return webdriver.Chrome(chrome_driver, options=chrome_options)
 
+# ----------------------------------
 # connect by port number and driver path
 driver = connect_to_opened_chrome(chromedriver, 9222)
-# go to project page
-
+# set up waiting
 main_wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException])
-
-# Origin code - Github repo interspection
-# ----------------------------------
-# driver.get("https://github.com/mezlogo/there_is_a_huge_snake_inside_my_jeans")
-# arrayOfWebElements = driver.find_elements_by_css_selector("div.Details div.Box-row")
-# get list of all files in repository
-# you can test this query by javascript console in browser `document.querySelectorAll("div.Details div.Box-row")`
-# convert to PyFunctional seq https://github.com/EntilZha/PyFunctional
 # ----------------------------------
 # elems = seq(arrayOfWebElements)
 # print pairs of file name and file type (dir of plain file)
@@ -78,6 +69,8 @@ wait_1 = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchEl
     until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-serp-item")))
 vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
 
+# pages = driver.find_elements_by_css_selector("span.bloko-button-group")
+
 # list_of_vacancies = []
 #
 # for vacancy in seq(vacancies):
@@ -99,7 +92,7 @@ vacancies = driver.find_elements_by_css_selector("div.vacancy-serp-item")
 
 vacancies_df = pd.DataFrame()
 
-for link in vacancies[0:3]:
+for link in vacancies:
     try:
         link.find_element_by_css_selector("a.HH-LinkModifier").click()
         driver.switch_to.window(driver.window_handles[1])

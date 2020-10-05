@@ -1,5 +1,5 @@
 from globals import chromedriver
 
-print("HELLO")
-print("path to chrome driver")
+print("HELLO!")
+print("Path to Chrome driver: ")
 print(chromedriver)
