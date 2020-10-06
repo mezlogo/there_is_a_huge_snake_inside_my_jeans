@@ -1,3 +1,5 @@
+###MAJOR UPDATE OF PROJECT. - 06.10.2020
+
 ###This is the first steps snake project.
 
 Example shows how to build and develop artifact using standard python ecosystem:
@@ -24,10 +26,13 @@ Getting started:
   
 5. Run script: `python src/hello.py`
 6. Download chrome driver: `https://sites.google.com/a/chromium.org/chromedriver/`
-7. Modify path to chrome in `src/globals.py`    
+7. Modify path to chrome and dataset folder in `src/globals.py`    
 8. Create and manipulate chrome using: `python src/open.py`
 9. Open chrome with remote address: `chromium --remote-debugging-port=9222 --user-data-dir=/tmp/chrometmp`
 
 **For Windows**: You need to change directory to the one in which the Chrome application is located and perform command: `./chrome.exe --remote-debugging-port=9222 --user-data-dir=/tmp/chrometmp`
 
 10. Connect to created browser: `python src/remote.py`
+
+
+
