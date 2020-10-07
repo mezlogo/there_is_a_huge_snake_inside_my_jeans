@@ -1,3 +1,5 @@
+import sys
+from dataclasses import dataclass
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -5,23 +7,32 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 
-from globals import chromedriver
-from globals import path_to_dataset_folder
+from chromium import *
 
 import pandas as pd
 
+@dataclass
+class ScrapperConfig:
+    path_to_driver: str
+    path_to_output: str
+    command: str
+    port: int
 
-# ----------------------------------
-# Connecting to Chrome
-def connect_to_opened_chrome(path_to_chrome_driver, port):
-    chrome_options = Options()
-    chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:" + str(port))
-    chrome_driver = path_to_chrome_driver
-    return webdriver.Chrome(chrome_driver, options=chrome_options)
+# usage: path_to_driver path_to_output command (open|connect port)
+def parseCliArguments():
+    argv = len(sys.argv)
+    if (argv < 4 or 5 < argv):
+        raise ValueError("usage: path_to_driver path_to_output command (open|connect port)")
+    args = sys.argv
+    port = int(args[4]) if 5 == argv else -1
+    command = "open" if "connect" != args[3] else "connect"
+    return ScrapperConfig(args[1], args[2], command, port)
 
-# ----------------------------------
-# Connect by port number and driver path
-driver = connect_to_opened_chrome(chromedriver, 9222)
+scrapperConfig = parseCliArguments()
+print(scrapperConfig)
+
+driver = open_chrome_browser(scrapperConfig.path_to_driver) if "open" == scrapperConfig.command else connect_to_opened_chrome(scrapperConfig.path_to_driver, scrapperConfig.port)
+
 # Set up waiting
 main_wait = WebDriverWait(driver, 5, poll_frequency=1, ignored_exceptions=[NoSuchElementException])
 # ----------------------------------
@@ -108,7 +119,7 @@ for link in vacancies:
 print("Scrapping is over. Congratulations!")
 # ----------------------------------
 # To CSV file
-vacancies_df.to_csv(path_to_dataset_folder + 'vacancies_data.csv')
+vacancies_df.to_csv(scrapperConfig.path_to_output + '/vacancies_data.csv')
 
 # ----------------------------------
 driver.quit()
